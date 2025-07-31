@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Car Match Quiz</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .quiz-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+      width: 100%;
+      padding: 40px;
+      animation: slideUp 0.6s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5em;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .subtitle {
+      color: #7f8c8d;
+      font-size: 1.1em;
+      margin-bottom: 10px;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 6px;
+      background: #ecf0f1;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      width: 0%;
+      transition: width 0.3s ease;
+      border-radius: 3px;
+    }
+
+    .question-container {
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+
+    .question-container:nth-child(2) { animation-delay: 0.1s; }
+    .question-container:nth-child(3) { animation-delay: 0.2s; }
+    .question-container:nth-child(4) { animation-delay: 0.3s; }
+    .question-container:nth-child(5) { animation-delay: 0.4s; }
+    .question-container:nth-child(6) { animation-delay: 0.5s; }
+    .question-container:nth-child(7) { animation-delay: 0.6s; }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    .question {
+      font-size: 1.2em;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .question-number {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9em;
+      font-weight: 700;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+
+    .answers {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .answer-option {
+      position: relative;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .answer-option:hover {
+      transform: translateX(5px);
+    }
+
+    .answer-option input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .answer-option label {
+      display: flex;
+      align-items: center;
+      padding: 15px 20px;
+      background: #f8f9fa;
+      border: 2px solid #e9ecef;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #495057;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .answer-option label::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      transition: left 0.5s;
+    }
+
+    .answer-option:hover label::before {
+      left: 100%;
+    }
+
+    .answer-option input[type="radio"]:checked + label {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-color: #667eea;
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    .custom-radio {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #cbd5e0;
+      border-radius: 50%;
+      margin-right: 15px;
+      position: relative;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .answer-option input[type="radio"]:checked + label .custom-radio {
+      border-color: white;
+      background: white;
+    }
+
+    .answer-option input[type="radio"]:checked + label .custom-radio::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      background: #667eea;
+      border-radius: 50%;
+    }
+
+    .submit-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .submit-btn:hover::before {
+      left: 100%;
+    }
+
+    #result {
+      margin-top: 30px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+    }
+
+    #result.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .results-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 15px;
+    }
+
+    .results-header h2 {
+      font-size: 2em;
+      margin-bottom: 10px;
+    }
+
+    .results-header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .car-ranking {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .car-card {
+      display: flex;
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .car-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .rank-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.2em;
+      z-index: 2;
+    }
+
+    .car-image {
+      width: 280px;
+      height: 200px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .car-info {
+      padding: 25px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .car-brand {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+
+    .car-model {
+      font-size: 1.1em;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .car-description {
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      flex: 1;
+    }
+
+    .car-specs {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      min-width: 80px;
+    }
+
+    .spec-label {
+      font-size: 0.8em;
+      color: #666;
+      margin-bottom: 2px;
+    }
+
+    .spec-value {
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .match-percentage {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: rgba(46, 204, 113, 0.9);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+
+    .restart-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 10px;
+      margin: 30px auto 0;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      display: block;
+    }
+
+    .restart-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    @media (max-width: 768px) {
+      .quiz-container {
+        margin: 10px;
+        padding: 25px;
+      }
+      
+      h1 {
+        font-size: 2em;
+      }
+      
+      .question {
+        font-size: 1.1em;
+      }
+
+      .car-card {
+        flex-direction: column;
+      }
+
+      .car-image {
+        width: 100%;
+        height: 180px;
+      }
+
+      .car-specs {
+        justify-content: center;
+      }
+
+      .rank-badge {
+        top: 10px;
+        left: 10px;
+        width: 35px;
+        height: 35px;
+        font-size: 1em;
+      }
+
+      .match-percentage {
+        top: 10px;
+        right: 10px;
+        padding: 6px 12px;
+        font-size: 0.8em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <div class="header">
+      <h1>🚗 Ultimate Car Match Quiz</h1>
+      <p class="subtitle">Discover your perfect car match from 12 premium brands!</p>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <form id="quizForm">
+      <div class="question-container">
+        <div class="question">
+          <span class="question-number">1</span>
+          What's your primary use for a car?
+        </div>
+        <div class="answers">
+          <div class="answer-option">
+            <input type="radio" name="q1" value="daily_commute" id="q1a" required />
+            <label for="q1a">
+              <span class="custom-radio"></span>
+              Daily commuting and city driving
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q1" value="family" id="q1b" />
+            <label for="q1b">
+              <span class="custom-radio"></span>
+              Family trips and cargo hauling
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q1" value="performance" id="q1c" />
+            <label for="q1c">
+              <span class="custom-radio"></span>
+              Weekend adventures and sporty driving
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q1" value="luxury" id="q1d" />
+            <label for="q1d">
+              <span class="custom-radio"></span>
+              Business and luxury transportation
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-container">
+        <div class="question">
+          <span class="question-number">2</span>
+          What's your budget range?
+        </div>
+        <div class="answers">
+          <div class="answer-option">
+            <input type="radio" name="q2" value="economy" id="q2a" required />
+            <label for="q2a">
+              <span class="custom-radio"></span>
+              $15,000 - $30,000 (Economy)
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q2" value="mid_range" id="q2b" />
+            <label for="q2b">
+              <span class="custom-radio"></span>
+              $30,000 - $50,000 (Mid-range)
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q2" value="premium" id="q2c" />
+            <label for="q2c">
+              <span class="custom-radio"></span>
+              $50,000 - $80,000 (Premium)
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q2" value="luxury" id="q2d" />
+            <label for="q2d">
+              <span class="custom-radio"></span>
+              $80,000+ (Luxury)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-container">
+        <div class="question">
+          <span class="question-number">3</span>
+          Which feature matters most to you?
+        </div>
+        <div class="answers">
+          <div class="answer-option">
+            <input type="radio" name="q3" value="reliability" id="q3a" required />
+            <label for="q3a">
+              <span class="custom-radio"></span>
+              Reliability and low maintenance costs
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q3" value="performance" id="q3b" />
+            <label for="q3b">
+              <span class="custom-radio"></span>
+              Engine power and handling
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q3" value="technology" id="q3c" />
+            <label for="q3c">
+              <span class="custom-radio"></span>
+              Advanced technology and innovation
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q3" value="efficiency" id="q3d" />
+            <label for="q3d">
+              <span class="custom-radio"></span>
+              Fuel efficiency and environmental impact
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-container">
+        <div class="question">
+          <span class="question-number">4</span>
+          What's your preferred vehicle type?
+        </div>
+        <div class="answers">
+          <div class="answer-option">
+            <input type="radio" name="q4" value="sedan" id="q4a" required />
+            <label for="q4a">
+              <span class="custom-radio"></span>
+              Sedan or compact car
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q4" value="suv" id="q4b" />
+            <label for="q4b">
+              <span class="custom-radio"></span>
+              SUV or crossover
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q4" value="sports" id="q4c" />
+            <label for="q4c">
+              <span class="custom-radio"></span>
+              Sports car or coupe
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q4" value="truck" id="q4d" />
+            <label for="q4d">
+              <span class="custom-radio"></span>
+              Pickup truck or utility vehicle
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-container">
+        <div class="question">
+          <span class="question-number">5</span>
+          How important is brand prestige to you?
+        </div>
+        <div class="answers">
+          <div class="answer-option">
+            <input type="radio" name="q5" value="practical" id="q5a" required />
+            <label for="q5a">
+              <span class="custom-radio"></span>
+              Not important - I focus on value and practicality
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q5" value="somewhat" id="q5b" />
+            <label for="q5b">
+              <span class="custom-radio"></span>
+              Somewhat important - I like respected brands
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q5" value="important" id="q5c" />
+            <label for="q5c">
+              <span class="custom-radio"></span>
+              Very important - Brand reputation matters
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q5" value="luxury" id="q5d" />
+            <label for="q5d">
+              <span class="custom-radio"></span>
+              Essential - I want luxury and status
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-container">
+        <div class="question">
+          <span class="question-number">6</span>
+          What's your driving experience preference?
+        </div>
+        <div class="answers">
+          <div class="answer-option">
+            <input type="radio" name="q6" value="comfortable" id="q6a" required />
+            <label for="q6a">
+              <span class="custom-radio"></span>
+              Smooth, comfortable, and quiet
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q6" value="engaging" id="q6b" />
+            <label for="q6b">
+              <span class="custom-radio"></span>
+              Engaging and responsive handling
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q6" value="efficient" id="q6c" />
+            <label for="q6c">
+              <span class="custom-radio"></span>
+              Efficient and environmentally conscious
+            </label>
+          </div>
+          <div class="answer-option">
+            <input type="radio" name="q6" value="powerful" id="q6d" />
+            <label for="q6d">
+              <span class="custom-radio"></span>
+              Powerful and thrilling
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        🎯 Discover My Perfect Car Match
+      </button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    // Car database with detailed information
+    const carDatabase = {
+      toyota: {
+        brand: "Toyota",
+        model: "Camry Hybrid",
+        description: "The gold standard of reliability meets modern efficiency. Perfect blend of comfort, dependability, and fuel economy.",
+        image: "https://images.unsplash.com/photo-1621007947382-bb3c3994e3fb?w=400&h=300&fit=crop",
+        price: "$32,000",
+        mpg: "52 MPG",
+        power: "208 HP",
+        type: "Sedan"
+      },
+      honda: {
+        brand: "Honda",
+        model: "Accord Sport",
+        description: "Sporty yet practical, the Accord offers exceptional build quality with engaging driving dynamics and spacious interior.",
+        image: "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=400&h=300&fit=crop",
+        price: "$37,000",
+        mpg: "32 MPG",
+        power: "252 HP",
+        type: "Sedan"
+      },
+      tesla: {
+        brand: "Tesla",
+        model: "Model 3",
+        description: "Revolutionary electric sedan with cutting-edge technology, autopilot capabilities, and zero emissions driving.",
+        image: "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=400&h=300&fit=crop",
+        price: "$47,000",
+        mpg: "120 MPGe",
+        power: "283 HP",
+        type: "Electric"
+      },
+      bmw: {
+        brand: "BMW",
+        model: "3 Series",
+        description: "The ultimate driving machine combining luxury, performance, and advanced technology in perfect harmony.",
+        image: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=400&h=300&fit=crop",
+        price: "$55,000",
+        mpg: "28 MPG",
+        power: "255 HP",
+        type: "Sedan"
+      },
+      mercedes: {
+        brand: "Mercedes-Benz",
+        model: "C-Class",
+        description: "Sophisticated luxury with cutting-edge safety features and refined comfort that defines premium automotive excellence.",
+        image: "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=400&h=300&fit=crop",
+        price: "$58,000",
+        mpg: "25 MPG",
+        power: "255 HP",
+        type: "Sedan"
+      },
+      audi: {
+        brand: "Audi",
+        model: "A4 Quattro",
+        description: "Progressive luxury with legendary all-wheel drive, premium interior, and advanced driver assistance systems.",
+        image: "https://images.unsplash.com/photo-1610768764270-790fbec18178?w=400&h=300&fit=crop",
+        price: "$56,000",
+        mpg: "27 MPG",
+        power: "261 HP",
+        type: "Sedan"
+      },
+      ford: {
+        brand: "Ford",
+        model: "F-150 Lightning",
+        description: "America's best-selling truck goes electric with impressive capability, advanced tech, and zero-emission power.",
+        image: "https://images.unsplash.com/photo-1605559424843-9e4c228bf1c2?w=400&h=300&fit=crop",
+        price: "$65,000",
+        mpg: "90 MPGe",
+        power: "452 HP",
+        type: "Truck"
+      },
+      porsche: {
+        brand: "Porsche",
+        model: "911 Carrera",
+        description: "Iconic sports car delivering pure driving exhilaration with legendary performance and timeless design.",
+        image: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?w=400&h=300&fit=crop",
+        price: "$115,000",
+        mpg: "22 MPG",
+        power: "379 HP",
+        type: "Sports"
+      },
+      lexus: {
+        brand: "Lexus",
+        model: "ES Hybrid",
+        description: "Japanese luxury at its finest with whisper-quiet operation, premium materials, and exceptional reliability.",
+        image: "https://images.unsplash.com/photo-1563720223185-11003d516935?w=400&h=300&fit=crop",
+        price: "$52,000",
+        mpg: "44 MPG",
+        power: "215 HP",
+        type: "Sedan"
+      },
+      volvo: {
+        brand: "Volvo",
+        model: "XC60 T8",
+        description: "Scandinavian luxury SUV with world-class safety, plug-in hybrid efficiency, and minimalist elegance.",
+        image: "https://images.unsplash.com/photo-1606016159991-781dfbb11847?w=400&h=300&fit=crop",
+        price: "$68,000",
+        mpg: "57 MPGe",
+        power: "400 HP",
+        type: "SUV"
+      },
+      jeep: {
+        brand: "Jeep",
+        model: "Wrangler 4xe",
+        description: "Legendary off-road capability meets modern hybrid efficiency in the most capable SUV ever built.",
+        image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+        price: "$54,000",
+        mpg: "49 MPGe",
+        power: "375 HP",
+        type: "SUV"
+      },
+      subaru: {
+        brand: "Subaru",
+        model: "Outback",
+        description: "Adventure-ready wagon with standard all-wheel drive, impressive ground clearance, and rugged reliability.",
+        image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop",
+        price: "$35,000",
+        mpg: "28 MPG",
+        power: "182 HP",
+        type: "SUV"
+      }
+    };
+
+    // Progress bar functionality
+    const form = document.getElementById('quizForm');
+    const progressFill = document.getElementById('progressFill');
+    const totalQuestions = 6;
+
+    function updateProgress() {
+      const answeredQuestions = form.querySelectorAll('input[type="radio"]:checked').length;
+      const progress = (answeredQuestions / totalQuestions) * 100;
+      progressFill.style.width = progress + '%';
+    }
+
+    // Add event listeners to all radio buttons
+    form.querySelectorAll('input[type="radio"]').forEach(radio => {
+      radio.addEventListener('change', updateProgress);
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const answers = {
+        q1: this.q1.value,
+        q2: this.q2.value,
+        q3: this.q3.value,
+        q4: this.q4.value,
+        q5: this.q5.value,
+        q6: this.q6.value,
+      };
+
+      // Initialize scores for all brands
+      let scores = {};
+      Object.keys(carDatabase).forEach(brand => {
+        scores[brand] = 0;
+      });
+
+      // Enhanced scoring logic
+      
+      // Question 1: Primary use
+      switch(answers.q1) {
+        case 'daily_commute':
+          scores.toyota += 4; scores.honda += 4; scores.tesla += 3; scores.lexus += 2;
+          break;
+        case 'family':
+          scores.volvo += 4; scores.subaru += 4; scores.honda += 3; scores.toyota += 2; scores.jeep += 2;
+          break;
+        case 'performance':
+          scores.porsche += 5; scores.bmw += 4; scores.audi += 3; scores.mercedes += 2; scores.tesla += 2;
+          break;
+        case 'luxury':
+          scores.mercedes += 5; scores.bmw += 4; scores.audi += 4; scores.lexus += 4; scores.porsche += 3;
+          break;
+      }
+
+      // Question 2: Budget
+      switch(answers.q2) {
+        case 'economy':
+          scores.toyota += 5; scores.honda += 4; scores.subaru += 3;
+          break;
+        case 'mid_range':
+          scores.toyota += 3; scores.honda += 3; scores.tesla += 2; scores.subaru += 3; scores.lexus += 2; scores.jeep += 2;
+          break;
+        case 'premium':
+          scores.tesla += 4; scores.bmw += 3; scores.audi += 3; scores.lexus += 4; scores.mercedes += 2; scores.volvo += 3; scores.ford += 3;
+          break;
+        case 'luxury':
+          scores.porsche += 5; scores.mercedes += 4; scores.bmw += 4; scores.audi += 4; scores.volvo += 2; scores.ford += 2;
+          break;
+      }
+
+      // Question 3: Feature priority
+      switch(answers.q3) {
+        case 'reliability':
+          scores.toyota += 5; scores.honda += 4; scores.lexus += 4; scores.subaru += 3;
+          break;
+        case 'performance':
+          scores.porsche += 5; scores.bmw += 4; scores.audi += 3; scores.mercedes += 3; scores.ford += 2;
+          break;
+        case 'technology':
+          scores.tesla += 5; scores.audi += 4; scores.mercedes += 4; scores.bmw += 3; scores.volvo += 3;
+          break;
+        case 'efficiency':
+          scores.tesla += 5; scores.toyota += 4; scores.lexus += 3; scores.volvo += 3; scores.jeep += 2;
+          break;
+      }
+
+      // Question 4: Vehicle type
+      switch(answers.q4) {
+        case 'sedan':
+          scores.toyota += 4; scores.honda += 4; scores.tesla += 3; scores.bmw += 3; scores.mercedes += 3; scores.audi += 3; scores.lexus += 4;
+          break;
+        case 'suv':
+          scores.volvo += 5; scores.jeep += 4; scores.subaru += 4; scores.lexus += 2;
+          break;
+        case 'sports':
+          scores.porsche += 5; scores.bmw += 3; scores.audi += 2; scores.mercedes += 2;
+          break;
+        case 'truck':
+          scores.ford += 5; scores.jeep += 3;
+          break;
+      }
+
+      // Question 5: Brand prestige
+      switch(answers.q5) {
+        case 'practical':
+          scores.toyota += 4; scores.honda += 4; scores.subaru += 3; scores.ford += 2;
+          break;
+        case 'somewhat':
+          scores.toyota += 2; scores.honda += 2; scores.tesla += 3; scores.lexus += 3; scores.volvo += 3; scores.subaru += 2;
+          break;
+        case 'important':
+          scores.bmw += 4; scores.audi += 4; scores.mercedes += 3; scores.lexus += 4; scores.tesla += 3; scores.volvo += 3;
+          break;
+        case 'luxury':
+          scores.porsche += 5; scores.mercedes += 5; scores.bmw += 4; scores.audi += 4; scores.lexus += 3;
+          break;
+      }
+
+      // Question 6: Driving experience
+      switch(answers.q6) {
+        case 'comfortable':
+          scores.lexus += 5; scores.mercedes += 4; scores.toyota += 3; scores.volvo += 3; scores.honda += 2;
+          break;
+        case 'engaging':
+          scores.bmw += 5; scores.porsche += 4; scores.audi += 4; scores.honda += 3; scores.subaru += 2;
+          break;
+        case 'efficient':
+          scores.tesla += 5; scores.toyota += 4; scores.lexus += 3; scores.volvo += 3; scores.jeep += 2;
+          break;
+        case 'powerful':
+          scores.porsche += 5; scores.ford += 4; scores.bmw += 3; scores.mercedes += 3; scores.jeep += 3; scores.volvo += 2;
+          break;
+      }
+
+      // Sort brands by score
+      const sortedBrands = Object.entries(scores)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5); // Get top 5
+
+      // Calculate match percentages
+      const maxScore = sortedBrands[0][1];
+      const rankedResults = sortedBrands.map(([brand, score], index) => {
+        const percentage = Math.round((score / maxScore) * 100);
+        return {
+          rank: index + 1,
+          brand: brand,
+          score: score,
+          percentage: percentage,
+          car: carDatabase[brand]
+        };
+      });
+
+      displayResults(rankedResults);
+    });
+
+    function displayResults(results) {
+      const resultDiv = document.getElementById('result');
+      
+      let html = `
+        <div class="results-header">
+          <h2>🏆 Your Car Match Results</h2>
+          <p>Here are your top 5 car matches, ranked by compatibility</p>
+        </div>
+        <div class="car-ranking">
+      `;
+
+      results.forEach(result => {
+        const car = result.car;
+        html += `
+          <div class="car-card">
+            <div class="rank-badge">${result.rank}</div>
+            <div class="match-percentage">${result.percentage}% Match</div>
+            <img src="${car.image}" alt="${car.brand} ${car.model}" class="car-image" />
+            <div class="car-info">
+              <div class="car-brand">${car.brand}</div>
+              <div class="car-model">${car.model}</div>
+              <div class="car-description">${car.description}</div>
+              <div class="car-specs">
+                <div class="spec-item">
+                  <div class="spec-label">Price</div>
+                  <div class="spec-value">${car.price}</div>
+                </div>
+                <div class="spec-item">
+                  <div class="spec-label">Efficiency</div>
+                  <div class="spec-value">${car.mpg}</div>
+                </div>
+                <div class="spec-item">
+                  <div class="spec-label">Power</div>
+                  <div class="spec-value">${car.power}</div>
+                </div>
+                <div class="spec-item">
+                  <div class="spec-label">Type</div>
+                  <div class="spec-value">${car.type}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        </div>
+        <button class="restart-btn" onclick="restartQuiz()">🔄 Take Quiz Again</button>
+      `;
+      
+      resultDiv.innerHTML = html;
+      resultDiv.classList.add('show');
+      
+      // Smooth scroll to result
+      setTimeout(() => {
+        resultDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 100);
+    }
+
+    function restartQuiz() {
+      document.getElementById('quizForm').reset();
+      document.getElementById('result').classList.remove('show');
+      document.getElementById('result').innerHTML = '';
+      progressFill.style.width = '0%';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+
+</body>
+</html>
